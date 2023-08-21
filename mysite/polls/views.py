@@ -58,16 +58,15 @@ def add_to_database():
         next(reader)  # Advance past the header
 
         bhav.objects.all().delete()
-        # Genre.objects.all().delete()
 
         for row in reader:
             # print(row)
             bhav1 = bhav(code = row[0],
-                        name = row[1],
-                        open = row[4],
-                        high = row[5],
-                        low  = row[6],
-                        close= row[7])
+                         name = row[1],
+                         open = row[4],
+                         high = row[5],
+                         low  = row[6],
+                         close= row[7])
             bhav1.save()
 
 
@@ -94,3 +93,28 @@ def index(request):
 
     add_to_database()
     return HttpResponse("✅ ZIP downloaded on: "+output_path+" from "+ url + "\n and csv file is also parsed")
+
+
+
+def fetch_data(request):
+    # bhav_list = bhav.objects.all()
+    # return render(request, 'polls/detail.html', {'bhav_list':bhav_list})
+    """View function for home page of site."""
+
+    # Generate counts of some of the main objects
+    bhav_list = bhav.objects.all()
+
+    # number_of_records = bhav.objects.filter(id=20096)
+
+    context = {
+        'code' : bhav_list
+        # 'code': bhav.objects.get(code=)
+        # 'name': name,
+        # 'open': open,
+        # 'high': high,
+        # 'low' : low,
+        # 'close':close
+    }
+
+    # Render the HTML template index.html with the data in the context variable
+    return render(request, 'polls/detail.html',context=context)

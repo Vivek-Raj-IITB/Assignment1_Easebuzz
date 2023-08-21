@@ -8,31 +8,54 @@ from django.views import generic
 from django.shortcuts import redirect, render, get_object_or_404
 from django.http import HttpResponse, HttpResponseRedirect
 from django.template.loader import render_to_string 
-import requests, zipfile, io
+import requests
+import zipfile
+from io import BytesIO
 from datetime import datetime, timedelta
-
+import requests
+import shutil
+import os
+import urllib
+from urllib.request import urlopen
+import pandas as pd
 
 def index(request):
     print('Downloading started')
-    yesterday = datetime.now() - timedelta(1)
-    # type(yesterday)
-    yesterday_date=datetime.strftime(yesterday, '%Y-%m-%d')
     
-    url_append = yesterday_date[-2]+yesterday_date[-1]+yesterday_date[-5]+yesterday_date[-4]+yesterday_date[2]+yesterday_date[3]
-    print(url_append)
-    url = 'https://www.bseindia.com/download/BhavCopy/Equity/EQ'+url_append+'_CSV.ZIP'
-    # url = 'https://www.bseindia.com/download/BhavCopy/Equity/EQ170823_CSV.ZIP'
+    # today's date
+    test_date = datetime.now()
+ 
+    # printing original date
+    # print("The original date is : " + str(test_date))
+    # Creating Timestamp
+    # ts = pd.Timestamp(str(test_date))
+    # Create an offset of 1 Business days
+    offset = pd.tseries.offsets.BusinessDay(n=1)
+    
+    # getting result by subtracting offset
+    res = test_date - offset
+    
+    # printing result
+    # print("Last business day : " + str(res))
 
-    #
-    # Downloading the file by sending the request to the URL
-    req = requests.get(url)
+    # extrctin date from the previous business day
+    yesterday_date=datetime.strftime(res, '%Y-%m-%d')
     
-    # Split URL to get the file name
-    filename = 'EQ170823_CSV.ZIP'
-    
-    # Writing the file to the local file system
-    with open(filename,'wb') as output_file:
-        output_file.write(req.content)
-    print('Downloading Completed')
-    return HttpResponse("Zip file downloaded"+url)
-    
+    date_to_append_in_url = yesterday_date[-2]+yesterday_date[-1]+yesterday_date[-5]+yesterday_date[-4]+yesterday_date[2]+yesterday_date[3]
+    # print(date_to_append_in_url)
+    url = 'https://www.bseindia.com/download/BhavCopy/Equity/EQ'+date_to_append_in_url+'_CSV.ZIP'
+    # url = 'https://www.bseindia.com/download/BhavCopy/Equity/EQ180823_CSV.ZIP' # original link for date 18/08/23
+    headers_1 = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36'}\
+    #extrating the file name of the zip file
+    filename = url.split('/')[-1]
+    # Outputs
+    output_path = "./zipFiles/"+filename
+    # request the file from website
+    req = urllib.request.Request(url, headers=headers_1)
+
+    # open it in a file and write it to save it in local
+    with urlopen(req) as response, open(output_path, 'wb') as f:
+        shutil.copyfileobj(response, f)
+    with zipfile.ZipFile("./zipFiles/"+filename, 'r') as zip_ref:
+        zip_ref.extractall("./extractedFiles")
+    return HttpResponse("✅ ZIP downloaded on:"+output_path+" from "+ url)

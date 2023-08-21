@@ -1,7 +1,8 @@
 from django.shortcuts import render
 from django.http import Http404
 from django.http import HttpResponse
-from .models import Question,Choice
+from polls.models import bhav
+import polls
 from django.template import loader
 from django.urls import reverse
 from django.views import generic
@@ -18,6 +19,35 @@ import os
 import urllib
 from urllib.request import urlopen
 import pandas as pd
+import csv
+
+def add_to_database():
+    test_date = datetime.now()
+    offset = pd.tseries.offsets.BusinessDay(n=1)
+    res = test_date - offset
+    yesterday_date=datetime.strftime(res, '%Y-%m-%d')
+    date_to_append_in_url = yesterday_date[-2]+yesterday_date[-1]+yesterday_date[-5]+yesterday_date[-4]+yesterday_date[2]+yesterday_date[3]
+    filename  = 'EQ'+date_to_append_in_url+'.CSV'
+
+    print(filename)
+    
+    with open('./extractedFiles/'+filename) as file:
+        reader = csv.reader(file)
+        next(reader)  # Advance past the header
+
+        bhav.objects.all().delete()
+        # Genre.objects.all().delete()
+
+        for row in reader:
+            # print(row)
+            bhav1 = bhav(code = row[0],
+                        name = row[1],
+                        open = row[4],
+                        high = row[5],
+                        low  = row[6],
+                        close= row[7])
+            bhav1.save()
+
 
 def index(request):
     print('Downloading started')
@@ -42,6 +72,7 @@ def index(request):
     yesterday_date=datetime.strftime(res, '%Y-%m-%d')
     
     date_to_append_in_url = yesterday_date[-2]+yesterday_date[-1]+yesterday_date[-5]+yesterday_date[-4]+yesterday_date[2]+yesterday_date[3]
+   
     # print(date_to_append_in_url)
     url = 'https://www.bseindia.com/download/BhavCopy/Equity/EQ'+date_to_append_in_url+'_CSV.ZIP'
     # url = 'https://www.bseindia.com/download/BhavCopy/Equity/EQ180823_CSV.ZIP' # original link for date 18/08/23
@@ -58,4 +89,6 @@ def index(request):
         shutil.copyfileobj(response, f)
     with zipfile.ZipFile("./zipFiles/"+filename, 'r') as zip_ref:
         zip_ref.extractall("./extractedFiles")
-    return HttpResponse("✅ ZIP downloaded on:"+output_path+" from "+ url)
+
+    add_to_database()
+    return HttpResponse("✅ ZIP downloaded on: "+output_path+" from "+ url)

@@ -21,13 +21,35 @@ from urllib.request import urlopen
 import pandas as pd
 import csv
 
-def add_to_database():
+
+def previous_business_day():
+    # today's date
     test_date = datetime.now()
+ 
+    # printing original date
+    # print("The original date is : " + str(test_date))
+    # Creating Timestamp
+    # ts = pd.Timestamp(str(test_date))
+    # Create an offset of 1 Business days
     offset = pd.tseries.offsets.BusinessDay(n=1)
+    
+    # getting result by subtracting offset
     res = test_date - offset
+    
+    # printing result
+    # print("Last business day : " + str(res))
+
+    # extrctin date from the previous business day
     yesterday_date=datetime.strftime(res, '%Y-%m-%d')
+    
     date_to_append_in_url = yesterday_date[-2]+yesterday_date[-1]+yesterday_date[-5]+yesterday_date[-4]+yesterday_date[2]+yesterday_date[3]
-    filename  = 'EQ'+date_to_append_in_url+'.CSV'
+   
+    return date_to_append_in_url
+
+def add_to_database():
+    
+    filename = previous_business_day()
+    filename = 'EQ'+filename+'.CSV'
 
     print(filename)
     
@@ -52,27 +74,7 @@ def add_to_database():
 def index(request):
     print('Downloading started')
     
-    # today's date
-    test_date = datetime.now()
- 
-    # printing original date
-    # print("The original date is : " + str(test_date))
-    # Creating Timestamp
-    # ts = pd.Timestamp(str(test_date))
-    # Create an offset of 1 Business days
-    offset = pd.tseries.offsets.BusinessDay(n=1)
-    
-    # getting result by subtracting offset
-    res = test_date - offset
-    
-    # printing result
-    # print("Last business day : " + str(res))
-
-    # extrctin date from the previous business day
-    yesterday_date=datetime.strftime(res, '%Y-%m-%d')
-    
-    date_to_append_in_url = yesterday_date[-2]+yesterday_date[-1]+yesterday_date[-5]+yesterday_date[-4]+yesterday_date[2]+yesterday_date[3]
-   
+    date_to_append_in_url = previous_business_day()
     # print(date_to_append_in_url)
     url = 'https://www.bseindia.com/download/BhavCopy/Equity/EQ'+date_to_append_in_url+'_CSV.ZIP'
     # url = 'https://www.bseindia.com/download/BhavCopy/Equity/EQ180823_CSV.ZIP' # original link for date 18/08/23
@@ -91,4 +93,4 @@ def index(request):
         zip_ref.extractall("./extractedFiles")
 
     add_to_database()
-    return HttpResponse("✅ ZIP downloaded on: "+output_path+" from "+ url)
+    return HttpResponse("✅ ZIP downloaded on: "+output_path+" from "+ url + "\n and csv file is also parsed")

@@ -107,13 +107,18 @@ def fetch_data(request):
     # number_of_records = bhav.objects.filter(id=20096)
 
     context = {
-        'code' : bhav_list
-        # 'code': bhav.objects.get(code=)
-        # 'name': name,
-        # 'open': open,
-        # 'high': high,
-        # 'low' : low,
-        # 'close':close
+        'previous_day_bhav' : bhav_list
+
+        # 'name' : bhav_list.values_list('name'),
+
+        # 'open' : bhav_list.values_list('open'),
+
+        # 'high' : bhav_list.values_list('high'),
+
+        # 'low' : bhav_list.values_list('low'),
+
+        # 'close' : bhav_list.values_list('close')
+
     }
 
     # Render the HTML template index.html with the data in the context variable

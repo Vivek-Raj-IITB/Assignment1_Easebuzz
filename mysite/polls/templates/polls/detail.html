@@ -4,13 +4,25 @@
   <h1>Bhav of previous day</h1>
   
   <h2>Dynamic content</h2>
-  <p>The library has the following record counts:</p>
-  <ul>
-    <li><strong>Code:</strong> {{ code }}</li>
-    {% comment %} <li><strong>Name:</strong> {{ name }}</li>
-    <li><strong>Open:</strong> {{ open }}</li>
-    <li><strong>High:</strong> {{ high }}</li>
-    <li><strong>Low:</strong> {{ low }}</li>
-    <li><strong>Close:</strong> {{ close }}</li> {% endcomment %}
-  </ul>
+  <p>These are the records from previous days:</p>
+  {% comment %} <table>
+    <tr>
+    <strong>Code:</strong>{% for c in code %}<li>{{c}}</li>{% endfor %}
+    <strong>Name:</strong>{% for c in name %}<li>{{c}}</li>{% endfor %}
+    </tr>
+    {% comment %} <col><strong>Open:</strong>{% for c in open %}<li>{{c}}</li>{% endfor %}</col></col>
+    <col><strong>High:</strong>{% for c in high %}<li>{{c}}</li>{% endfor %}</col></col>
+    <col><strong>Low:</strong>{% for c in low %}<li>{{c}}</li>{% endfor %}</col></col>
+    <col><strong>Close:</strong>{% for c in close %}<li>{{c}}</li>{% endfor %}</col></col> {% endcomment %}
+
+    {%for bhavs in previous_day_bhav%}
+    <ul>
+      <li>{{bhavs.code}}</li>
+      <li>{{bhavs.name}}</li>
+      <li>{{bhavs.open}}</li>
+      <li>{{bhavs.high}}</li>
+      <li>{{bhavs.low}}</li>
+      <li>{{bhavs.close}}</li>
+    </ul>
+    {%endfor%}
 {% endblock %}

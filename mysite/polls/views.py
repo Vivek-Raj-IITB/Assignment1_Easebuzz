@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import Http404
 from django.http import HttpResponse
-from polls.models import bhav
+from polls.models import *
 import polls
 from django.template import loader
 from django.urls import reverse
@@ -20,6 +20,30 @@ import urllib
 from urllib.request import urlopen
 import pandas as pd
 import csv
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from . serializer import *
+
+
+
+
+class ReactView(APIView):
+    def get(self,request):
+        output = [{"code":output.code,
+                   "name":output.name,
+                   "open":output.open,
+                   "high":output.high,
+                   "low":output.low,
+                   "close":output.close}
+                   for output in bhav.objects.all()]
+        return Response(output)
+    
+    def post(self,request):
+        serializer = bhavSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            serializer.save()
+            return Response(serializer.data)
+
 
 
 def previous_business_day():
@@ -70,7 +94,7 @@ def add_to_database():
             bhav1.save()
 
 
-def index(request):
+def fetch_and_save(request):
     print('Downloading started')
     
     date_to_append_in_url = previous_business_day()
@@ -96,7 +120,7 @@ def index(request):
 
 
 
-def fetch_data(request):
+def fetch_and_display(request):
     # bhav_list = bhav.objects.all()
     # return render(request, 'polls/detail.html', {'bhav_list':bhav_list})
     """View function for home page of site."""

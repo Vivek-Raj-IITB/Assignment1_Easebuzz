@@ -19,9 +19,9 @@ from . import views
 
 app_name = "polls"
 urlpatterns = [
-    path("fetch_and_save/", views.index, name="index"),
+    path("fetch_and_save/", views.fetch_and_save, name="fetch_and_save"),
     # path("", views.IndexView.as_view(), name="index"),
-    path("fetch_and_display/", views.fetch_data, name="detail"),
+    path("fetch_and_display/", views.fetch_and_display, name="fetch_and_display"),
     # path("<int:pk>/results/", views.ResultsView.as_view(), name="results"),
     # path("<int:question_id>/vote/", views.vote, name="vote"),
 ]

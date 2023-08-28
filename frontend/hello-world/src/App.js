@@ -4,6 +4,8 @@ import './App.css';
 // import axios from 'axios'
 import React, { useEffect, useState } from 'react';
 import UserData from './components/UserData';
+import { SearchBar } from "./components/SearchBar";
+import { SearchResultsList } from "./components/SearchResultsList";
 
 const API  = "http://127.0.0.1:8000/"
 
@@ -35,9 +37,17 @@ const App = () => {
   }, [])
   // console.log("how ar eo y ", users);
  
-    
+  const [results, setResults] = useState([]);
   return <>
   <center> <h1>Bhav of Previous business Day</h1> </center>
+  {/* // here search bar */}
+  <div className="App">
+      <div className="search-bar-container">
+        <SearchBar setResults={setResults} />
+        {results && results.length > 0 && <SearchResultsList results={results} />}
+      </div>
+    </div>
+    {/* // here end the search bar */}
     <table>
       <thead>
         <tr>

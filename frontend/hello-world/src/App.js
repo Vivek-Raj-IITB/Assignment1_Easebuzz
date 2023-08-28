@@ -11,8 +11,6 @@ const API  = "http://127.0.0.1:8000/"
 
 
 
-
-
 const App = () => {
   const [users, setUsers] = useState([]);
 
@@ -21,10 +19,12 @@ const App = () => {
   const fetchUsers = async (url) => {
     try{
       const res  = await fetch(url);
+      // console.log("res: ",res, "type of res: ",typeof(res))
       const data = await res.json();
-      // if(data.lenght >  0){
+      // console.log("data: ",data, "type of data: ",typeof(data), data.length)
+      if(data.length >  0){
         setUsers(data);
-      // }
+      }
       console.log(data);
     }catch(e){
       console.error(e)
@@ -37,9 +37,7 @@ const App = () => {
  
     
   return <>
-  <center>
-  <h1>Bhav of Previous business Day</h1>
-  </center>
+  <center> <h1>Bhav of Previous business Day</h1> </center>
     <table>
       <thead>
         <tr>

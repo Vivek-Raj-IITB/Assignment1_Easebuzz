@@ -117,7 +117,7 @@ def fetch_and_save(request):
 
     add_to_database()
     return HttpResponse("✅ ZIP downloaded on: "+output_path+" from "+ url + "\n and csv file is also parsed")
-
+ 
 
 
 def fetch_and_display(request):
@@ -147,3 +147,13 @@ def fetch_and_display(request):
 
     # Render the HTML template index.html with the data in the context variable
     return render(request, 'polls/detail.html',context=context)
+
+def delete_record(request, bhav_code):
+    record = get_object_or_404(bhav, pk=bhav_code)
+    output  = str(record.code)+" and "+record.name
+    record.delete()
+    return HttpResponse("Record with the following code and name:  " + output + " is deleted")
+
+
+    
+

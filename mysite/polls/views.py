@@ -23,10 +23,41 @@ import csv
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from . serializer import *
+from rest_framework import status
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 
 
+from django.contrib.auth.models import User
+from polls.serializer import bhavSerializer
+from rest_framework import generics
+from rest_framework.permissions import IsAdminUser
 
+@api_view(['GET', 'PUT', 'DELETE'])
+def bhav_detail(request, pk):
+    """
+    Retrieve, update or delete a code snippet.
+    """
+    try:
+        snippet = bhav.objects.get(pk=pk)
+    except bhav.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
+    if request.method == 'GET':
+        serializer = bhavSerializer(snippet)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        serializer = bhavSerializer(snippet, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        snippet.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
 class ReactView(APIView):
     def get(self,request):
         output = [{"code":output.code,
@@ -43,6 +74,12 @@ class ReactView(APIView):
         if serializer.is_valid(raise_exception=True):
             serializer.save()
             return Response(serializer.data)
+    
+    # def delete(self,request,pk):
+    #     snippet = self.get_object(pk)
+    #     snippet.delete()
+    #     return Response(status=status.HTTP_204_NO_CONTENT) 
+    
 
 
 
@@ -153,7 +190,4 @@ def delete_record(request, bhav_code):
     output  = str(record.code)+" and "+record.name
     record.delete()
     return HttpResponse("Record with the following code and name:  " + output + " is deleted")
-
-
-    
 

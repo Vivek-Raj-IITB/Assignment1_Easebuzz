@@ -55,6 +55,7 @@ const App = () => {
         <th>HIGH</th>
         <th>LOW</th>
         <th>CLOSE</th>
+        <th>DELETE?</th>
         </tr>
       </thead>
       <tbody>

@@ -1,6 +1,7 @@
 import swal from 'sweetalert'
 // import App from '../App';
 import "./UserData.css"
+// import {Form} from "antd"
 
 const deleteRecord = ({curUser}) => {
     console.log(curUser.code);
@@ -32,36 +33,21 @@ const deleteRecord = ({curUser}) => {
       });
 
 }
-const updateRecord = ({curUser}) => {
-    console.log(curUser.code);
+// const updateRecord = ({curUser}) => {
+//     const [modalOpen, setModalOpen] = useState(false);
+//     // const handleEditRow = (idx) => {
+//         // setRowToEdit(idx);
+    
+//         // setModalOpen(true);
+//     // };
+    
+//     return(
+//         <div><Modal/></div>
+//     )
 
-    swal({
-        title: "Confirm",
-        text: "Are you sure you want to delete : " + curUser.name,
-        icon: "info",
-        buttons: ['CANCEL','CONFIRM',],
-        dangerMode: true,
-      })
-      .then(function(result){
-        try{
-            fetch(`http://127.0.0.1:8000/${curUser.code}`,{method:'DELETE'}).then((result)=>{
-                window.location.reload();
-                swal({
-                    title: "Deleted",
-                    text: curUser.name+" is deleted from the record",
-                    icon: "info",
-                    dangerMode: true,
-                  });
+// }
 
-            });
-        }catch(e){
-            console.error(e)
-        }
-      });
-
-}
-
-const UserData = ({users}) => {
+const UserData = ({users, editRow}) => {
 
     return (
         <>
@@ -80,7 +66,7 @@ const UserData = ({users}) => {
                                
             
                             <button class="btn" onClick={() => deleteRecord({curUser})}>Delete</button>
-                            <button class="btn" onClick={() => updateRecord({curUser})}>Update</button>
+                            <button class="btn" onClick={() => deleteRecord({curUser})}>Update</button>
                             
                            
 

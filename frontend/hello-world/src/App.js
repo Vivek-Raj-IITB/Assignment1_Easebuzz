@@ -2,19 +2,109 @@
 import './App.css';
 // import Greet from './components/Greet';
 // import axios from 'axios'
+import swal from 'sweetalert'
+import {Button, Table, Form, Input } from "antd"
+
+import "antd/dist/reset.css";
+
+// import {Button, Table, Form, Input } from "antd"
 import React, { useEffect, useState } from 'react';
-import UserData from './components/UserData';
+// import UserData from './components/UserData';
 import { SearchBar } from "./components/SearchBar";
 import { SearchResultsList } from "./components/SearchResultsList";
-
 const API  = "http://127.0.0.1:8000/"
+// import { useState } from "react/cjs/react.development";
 
 
 const App = () => {
-  const [users, setUsers] = useState([]);
+  const [dataSource, setUsers] = useState([]);
+  const [editingRow, setEditingRow] = useState(null);
+  const [form] = Form.useForm();  
+  
+  // delete funtion starts
+  const deleteRecord = (curUser) => {
+    // console.log(curUser.code + " here we are logging");
 
- 
+    swal({
+        title: "Confirm",
+        text: "Are you sure you want to delete : " + curUser.name,
+        icon: "info",
+        buttons: ['CANCEL','CONFIRM',],
+        dangerMode: true,
+      })
+      .then(function(result){
+        if(result){
+            try{
+                fetch(`http://127.0.0.1:8000/${curUser.code}`,{method:'DELETE'}).then((result)=>{
+                fetchUsers(API);
+                swal({
+                    title: "Deleted",
+                    text: curUser.name+" is deleted from the record",
+                    icon: "info",
+                    dangerMode: true,
+                });
+                
+                // window.location.reload();
+                    
+                });
+                
+               
+            }catch(e){
+                console.error(e)
+            }
+        }
+      });
 
+    }
+
+  // delete funtion ends
+  //update starts
+  const onFinish = (values) => {
+    
+  
+    try{ 
+      fetch(API+values.code+'/',{
+        method:'PUT',
+        body:JSON.stringify(values),
+        headers:{
+          'Content-type':'application/json; charset=UTF-8',
+        },
+      })
+      .then(response=>{
+        response.json()
+        // console.log(response,"check")
+        if(response.status === 200){
+          fetchUsers(API);
+            swal({
+              title: "Updated",
+              text: values.code+" is updated in the record",
+              icon: "info",
+              dangerMode: true,
+          });
+        }
+      });
+      
+      setEditingRow(null);
+  }catch(e){
+
+    console.error(e);
+}
+    // this.setState({
+    //   code:'',
+    //   name:'',
+    //   open:'',
+    //   high:'',
+    //   low:'',
+    //   close:''
+    // });
+    // window.location.reload();
+    
+    
+
+  };
+  // ant end
+
+  //updateends
   const fetchUsers = async (url) => {
     try{
       const res  = await fetch(url);
@@ -25,6 +115,7 @@ const App = () => {
         setUsers(data);
       }
       console.log(data);
+
     }catch(e){
       console.error(e)
     }
@@ -32,36 +123,159 @@ const App = () => {
 
   useEffect(()=>{fetchUsers(API);
   }, [])
-  // console.log("how ar eo y ", users);
+  //antd  start
+  const columns = [
+    {
+      title: "Code",
+      dataIndex: "code",
+      render: (text, record) => {
+        if (editingRow === record.code) {
+          return (
+            <Form.Item
+              name="code"
+              rules={[
+                {
+                  required: true,
+                  message: "Please enter the code",
+                },
+              ]}
+            >
+              <Input />
+            </Form.Item>
+          );
+        } else {
+          return <p>{text}</p>;
+        }
+      },
+    },
+    {
+      title: "Name",
+      dataIndex: "name",
+      render: (text, record) => {
+        if (editingRow === record.code) {
+          return (
+            <Form.Item name="name">
+              <Input />
+            </Form.Item>
+          );
+        } else {
+          return <p>{text}</p>;
+        }
+      },
+    },
+    {
+      title: "Open",
+      dataIndex: "open",
+      render: (text, record) => {
+        if (editingRow === record.code) {
+          return (
+            <Form.Item name="open">
+              <Input />
+            </Form.Item>
+          );
+        } else {
+          return <p>{text}</p>;
+        }
+      },
+    },
+    {
+      title: "High",
+      dataIndex: "high",
+      render: (text, record) => {
+        if (editingRow === record.code) {
+          return (
+            <Form.Item name="high">
+              <Input />
+            </Form.Item>
+          );
+        } else {
+          return <p>{text}</p>;
+        }
+      },
+    },
+    {
+      title: "Low",
+      dataIndex: "low",
+      render: (text, record) => {
+        if (editingRow === record.code) {
+          return (
+            <Form.Item name="low">
+              <Input />
+            </Form.Item>
+          );
+        } else {
+          return <p>{text}</p>;
+        }
+      },
+    },
+    {
+      title: "Close",
+      dataIndex: "close",
+      render: (text, record) => {
+        if (editingRow === record.code) {
+          return (
+            <Form.Item name="close">
+              <Input />
+            </Form.Item>
+          );
+        } else {
+          return <p>{text}</p>;
+        }
+      },
+    },
+    {
+      title: "Actions",
+      render: (_, record) => {
+        // console.log(record);
+        return (
+          <>
+            <Button
+              type="link"
+              onClick={() => {
+                setEditingRow(record.code);
+                form.setFieldsValue({
+                  name: record.name,
+                  code: record.code,
+                  open: record.open,
+                  high: record.high,
+                  low: record.low,
+                  close:record.close,
+                });
+              }}
+            >
+              Edit
+            </Button>
+            <Button type="link" htmlType="submit">
+              Save
+            </Button>
+            <Button type="link" onClick={() => deleteRecord(record)}>
+              Delete
+            </Button>
+          </>
+        );
+      },
+    },
+  ];
+  
+
  
   const [results, setResults] = useState([]);
+  // if(results.length<=0)fetchUsers(API);
   return <>
   <center> <h1>Bhav of Previous business Day</h1> </center>
   {/* // here search bar */}
   <div>
       <div className="search-bar-container">
-        <SearchBar setResults={setResults} users={users} />
-        {/* <SearchBar/> */}
+        <SearchBar setResults={setResults} users={dataSource} setUsers={setUsers} fetchUsers={fetchUsers}/>
         {results && results.length > 0 && <SearchResultsList results={results}/>}
       </div>
     </div>
     {/* // here end the search bar */}
-    <table>
-      <thead>
-        <tr>
-        <th>CODE</th>
-        <th>NAME</th>
-        <th>OPEN</th>
-        <th>HIGH</th>
-        <th>LOW</th>
-        <th>CLOSE</th>
-        <th>DELETE?</th>
-        </tr>
-      </thead>
-      <tbody>
-        <UserData users = {users}/>
-      </tbody>
-    </table>
+    <header className="App-header">
+        <Form form={form} onFinish={onFinish}>
+        <Table columns={columns} dataSource={dataSource}></Table>
+        </Form>
+      </header>
   </>
 }
 

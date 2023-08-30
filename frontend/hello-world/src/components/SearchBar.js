@@ -2,10 +2,10 @@ import { useState } from "react";
 import { FaSearch } from "react-icons/fa";
 
 import "./SearchBar.css";
-
-export const SearchBar = ({ setResults ,users} ) => {
+const API  = "http://127.0.0.1:8000/"
+export const SearchBar = ({ setResults ,users, setUsers,fetchUsers} ) => {
   const [input, setInput] = useState("");
-
+  
   const fetchData = (value) => {
     // fetch("http://127.0.0.1:8000/")
     //   .then((response) => response.json())
@@ -20,10 +20,16 @@ export const SearchBar = ({ setResults ,users} ) => {
           );
         });
         setResults(results);
+        setUsers(results);
+        // if(value.length===0){
+          // console.log(value.length+" here  and there xoxo");
+          // setUsers(users);
+        // }
       // });
   };  
   const handleChange = (value) => {
     
+    // setUsers(users);
     setInput(value);
     fetchData(value.toLowerCase());
   };

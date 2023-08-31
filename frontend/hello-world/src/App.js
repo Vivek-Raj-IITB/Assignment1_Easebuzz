@@ -66,7 +66,7 @@ const App = () => {
     .then(response=>{ localStorage.setItem('storedData',response.status)});
     
     let resStatus = localStorage.getItem('storedData');
-    // console.log(resStatus, " hihihihihihih");
+    console.log(resStatus, " hihihihihihih");
 
     let num1=200,num2=404;
     if(resStatus===num1.toString()){ 

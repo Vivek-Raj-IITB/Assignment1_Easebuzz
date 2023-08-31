@@ -1,13 +1,18 @@
 from django.urls import path
 from rest_framework.urlpatterns import format_suffix_patterns
 from polls import views
+from rest_framework import routers
 
+router = routers.SimpleRouter()
+router.register(r'list',views.UserViewSet)
 
 
 from . import views
 
+
 app_name = "polls"
-urlpatterns = [
+urlpatterns = router.urls
+urlpatterns += [
     path("fetch_and_save/", views.fetch_and_save, name="fetch_and_save"),
     # path("", views.IndexView.as_view(), name="index"),
     path("fetch_and_display/", views.fetch_and_display, name="fetch_and_display"),

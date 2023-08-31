@@ -9,7 +9,10 @@ class bhav(models.Model):
     high = models.DecimalField(max_digits=10, decimal_places=2)
     low  = models.DecimalField(max_digits=10, decimal_places=2)
     close= models.DecimalField(max_digits=10, decimal_places=2)
-
+    class Meta:
+            ordering = ('code','name','open','high','low','close',)
+    def __str__(self):
+        return self.name
 
 # class Question(models.Model):
 #     question_text = models.CharField(max_length=200)

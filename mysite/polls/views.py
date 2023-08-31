@@ -27,13 +27,13 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-
+from rest_framework import viewsets
 from django.contrib.auth.models import User
 from polls.serializer import bhavSerializer
 from rest_framework import generics
 from rest_framework.permissions import IsAdminUser
 
-@api_view(['GET', 'PUT', 'DELETE'])
+@api_view(['GET', 'PUT', 'DELETE','POST'])
 def bhav_detail(request, pk):
     """
     Retrieve, update or delete a code snippet.
@@ -53,11 +53,25 @@ def bhav_detail(request, pk):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+    elif request.method == 'POST':
+        serializer = bhavSerializer(data =request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
         snippet.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-    
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset  = bhav.objects.all()
+    serializer_class = bhavSerializer
+    permission_classes =[]
+
+
 class ReactView(APIView):
     def get(self,request):
         output = [{"code":output.code,

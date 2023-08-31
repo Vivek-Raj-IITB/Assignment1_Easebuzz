@@ -4,7 +4,6 @@ import './App.css';
 // import axios from 'axios'
 import swal from 'sweetalert'
 import {Button, Table, Form, Input } from "antd"
-
 import "antd/dist/reset.css";
 
 // import {Button, Table, Form, Input } from "antd"
@@ -18,6 +17,7 @@ const API  = "http://127.0.0.1:8000/"
 
 const App = () => {
   const [dataSource, setUsers] = useState([]);
+  const [dataSourceCur, setUsersCurrentValue ] = useState([]);
   const [editingRow, setEditingRow] = useState(null);
   const [form] = Form.useForm();  
   
@@ -60,9 +60,17 @@ const App = () => {
   // delete funtion ends
   //update starts
   const onFinish = (values) => {
+    // console.log(values, " here we are printing values updated");
+    // let resStatus;
+    fetch(API+values.code+'/')
+    .then(response=>{ localStorage.setItem('storedData',response.status)});
     
-  
-    try{ 
+    let resStatus = localStorage.getItem('storedData');
+    // console.log(resStatus, " hihihihihihih");
+
+    let num1=200,num2=404;
+    if(resStatus===num1.toString()){ 
+      console.log(resStatus, " hihihihihihih");
       fetch(API+values.code+'/',{
         method:'PUT',
         body:JSON.stringify(values),
@@ -83,12 +91,35 @@ const App = () => {
           });
         }
       });
+    }
+    else if(resStatus=== num2.toString()){
+      fetch(API+'/',{
+        method:'POST',
+        body:JSON.stringify( values),
+        headers:{
+          'Content-type':'application/json; charset=UTF-8',
+        },
+      })
+      .then(response=>{
+        response.json()
+        if(response.status===200){
+      fetchUsers(API);
+        swal({
+          title: "Added a new",
+          text: values.code+" is added in the record",
+          icon: "info",
+          dangerMode: true,
+      });
+    }
+    });
+    }
       
       setEditingRow(null);
-  }catch(e){
-
-    console.error(e);
-}
+    //   }
+    //   catch(e){
+    //     alert("Given Code already exits");
+    //     console.error(e, "here is the error");
+    // }
     // this.setState({
     //   code:'',
     //   name:'',
@@ -113,8 +144,9 @@ const App = () => {
       // console.log("data: ",data, "type of data: ",typeof(data), data.length)
       if(data.length >  0){
         setUsers(data);
+        setUsersCurrentValue(data);
       }
-      console.log(data);
+      // console.log(data);
 
     }catch(e){
       console.error(e)
@@ -266,14 +298,14 @@ const App = () => {
   {/* // here search bar */}
   <div>
       <div className="search-bar-container">
-        <SearchBar setResults={setResults} users={dataSource} setUsers={setUsers} fetchUsers={fetchUsers}/>
+        <SearchBar setResults={setResults} users={dataSource} setUsers={setUsers} setUsersCurrentValue={setUsersCurrentValue}/>
         {results && results.length > 0 && <SearchResultsList results={results}/>}
       </div>
     </div>
     {/* // here end the search bar */}
     <header className="App-header">
         <Form form={form} onFinish={onFinish}>
-        <Table columns={columns} dataSource={dataSource}></Table>
+        <Table columns={columns} dataSource={dataSourceCur}></Table>
         </Form>
       </header>
   </>

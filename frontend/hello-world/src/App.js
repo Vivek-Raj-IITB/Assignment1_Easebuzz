@@ -67,6 +67,10 @@ const App = () => {
     
     let resStatus = localStorage.getItem('storedData');
     console.log(resStatus, " hihihihihihih");
+<<<<<<< HEAD
+=======
+    // resStatus=resStatus;
+>>>>>>> 635bff12 (mysql integrated)
 
     let num1=200,num2=404;
     if(resStatus===num1.toString()){ 
@@ -303,11 +307,13 @@ const App = () => {
       </div>
     </div>
     {/* // here end the search bar */}
+    <div className="App">
     <header className="App-header">
         <Form form={form} onFinish={onFinish}>
         <Table columns={columns} dataSource={dataSourceCur}></Table>
         </Form>
       </header>
+      </div>
   </>
 }
 

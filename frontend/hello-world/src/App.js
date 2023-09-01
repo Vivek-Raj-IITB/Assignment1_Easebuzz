@@ -67,10 +67,8 @@ const App = () => {
     
     let resStatus = localStorage.getItem('storedData');
     console.log(resStatus, " hihihihihihih");
-<<<<<<< HEAD
-=======
+
     // resStatus=resStatus;
->>>>>>> 635bff12 (mysql integrated)
 
     let num1=200,num2=404;
     if(resStatus===num1.toString()){ 

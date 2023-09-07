@@ -11,7 +11,10 @@ import React, { useEffect, useState } from 'react';
 // import UserData from './components/UserData';
 import { SearchBar } from "./components/SearchBar";
 import { SearchResultsList } from "./components/SearchResultsList";
-const API  = "http://127.0.0.1:8000/"
+import { Download_and_save } from './components/Download_and_save';
+// import { download_and_save } from "./components/download_and_save";
+
+const API  = "http://127.0.0.1:8000/api/"
 // import { useState } from "react/cjs/react.development";
 
 
@@ -35,7 +38,7 @@ const App = () => {
       .then(function(result){
         if(result){
             try{
-                fetch(`http://127.0.0.1:8000/${curUser.code}`,{method:'DELETE'}).then((result)=>{
+                fetch(`http://127.0.0.1:8000/api/${curUser.code}`,{method:'DELETE'}).then((result)=>{
                 fetchUsers(API);
                 swal({
                     title: "Deleted",
@@ -62,18 +65,23 @@ const App = () => {
   const onFinish = (values) => {
     // console.log(values, " here we are printing values updated");
     // let resStatus;
-    fetch(API+values.code+'/')
-    .then(response=>{ localStorage.setItem('storedData',response.status)});
+    const API1  = "http://127.0.0.1:8000/api/"
+    console.log(values.code, "checing the code of upating");
+    // fetch(API1+values.code+'/')
+    // .then(response=>{ localStorage.setItem('storedData',response.status)});
     
-    let resStatus = localStorage.getItem('storedData');
-    console.log(resStatus, " hihihihihihih");
+    // let resStatus = localStorage.getItem('storedData');
+    let present = false;
 
-    // resStatus=resStatus;
-
-    let num1=200,num2=404;
-    if(resStatus===num1.toString()){ 
-      console.log(resStatus, " hihihihihihih");
-      fetch(API+values.code+'/',{
+    for(let x in dataSource){
+      if(dataSource[x].code===values.code){
+        present=true;
+      }
+    }
+    console.log(present," hohohohohohoho");
+    if(present){ 
+      // console.log(resStatus, " hihihihihihih");
+      fetch(API1+values.code+'/',{
         method:'PUT',
         body:JSON.stringify(values),
         headers:{
@@ -94,8 +102,8 @@ const App = () => {
         }
       });
     }
-    else if(resStatus=== num2.toString()){
-      fetch(API+'/',{
+    else{
+      fetch('http://127.0.0.1:8000/api/',{
         method:'POST',
         body:JSON.stringify( values),
         headers:{
@@ -138,10 +146,11 @@ const App = () => {
   // ant end
 
   //updateends
-  const fetchUsers = async (url) => {
+  const fetchUsers =  async(url) => {
     try{
       const res  = await fetch(url);
-      // console.log("res: ",res, "type of res: ",typeof(res))
+
+      // console.log(res.status, "hwre is startus")
       const data = await res.json();
       // console.log("data: ",data, "type of data: ",typeof(data), data.length)
       if(data.length >  0){
@@ -153,6 +162,21 @@ const App = () => {
     }catch(e){
       console.error(e)
     }
+    ////////////////////////////
+    //   try{
+    //     fetch(url,{method:'GET'}).then((result)=>{
+    //       console.log(result.body, "lolololololololoqwqeq");
+    //     setUsers(result);
+    //     setUsersCurrentValue(results);
+       
+            
+    //     });
+        
+      
+    // }catch(e){
+    //     console.error(e)
+    // }
+    
   }
 
   useEffect(()=>{fetchUsers(API);
@@ -174,7 +198,7 @@ const App = () => {
                 },
               ]}
             >
-              <Input />
+            <Input />
             </Form.Item>
           );
         } else {
@@ -291,17 +315,24 @@ const App = () => {
     },
   ];
   
+  
 
- 
   const [results, setResults] = useState([]);
   // if(results.length<=0)fetchUsers(API);
   return <>
   <center> <h1>Bhav of Previous business Day</h1> </center>
+  {/* <div><Button  onClick={() => FETCH_AND_SAVE(API)}>Download_todays_bhav</Button></div> */}
+  <div >
+    <div className='fetchandsave'> 
+    {<Download_and_save url={API}/>}
+    </div>
+  </div>
   {/* // here search bar */}
   <div>
       <div className="search-bar-container">
         <SearchBar setResults={setResults} users={dataSource} setUsers={setUsers} setUsersCurrentValue={setUsersCurrentValue}/>
         {results && results.length > 0 && <SearchResultsList results={results}/>}
+        {/* {<Download_and_save/>} */}
       </div>
     </div>
     {/* // here end the search bar */}

@@ -21,6 +21,6 @@ from polls.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path("", ReactView.as_view(), name="React_view"),
-    path("", include("polls.urls")),
+    # path("api/", ReactView.as_view(), name="React_view"),
+    path("api/", include("polls.urls")),
 ]

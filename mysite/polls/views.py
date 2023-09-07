@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.http import Http404
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from polls.models import *
 import polls
 from django.template import loader
@@ -32,23 +32,63 @@ from django.contrib.auth.models import User
 from polls.serializer import bhavSerializer
 from rest_framework import generics
 from rest_framework.permissions import IsAdminUser
+from rest_framework.renderers import JSONRenderer
+
+@api_view(['GET'])
+def bhav_list(request):
+    bhavs= bhav.objects.all()
+    serializer = bhavSerializer(bhavs, many = True)
+    json_data = JSONRenderer().render(serializer.data)
+    # print(type(serializer.data), "hello")
+    return Response(serializer.data)
+    # return Response(json_data)
+    # return JsonResponse(serializer.data,safe=False)
+
+# @api_view(['GET', 'PUT', 'DELETE','POST'])
+# def bhav_details(request,pk):
+#     bhavs= bhav.objects.get(pk=pk)
+#     serializer = bhavSerializer(bhavs, many = False)
+#     return Response(serializer.data)
+@api_view(['GET', 'PUT', 'DELETE','POST'])
+def bhav_add(request):
+    if request.method == 'POST':
+        serializer = bhavSerializer(data =  request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET', 'PUT', 'DELETE','POST'])
-def bhav_detail(request, pk):
+def bhav_detail(request, pk=1):
     """
     Retrieve, update or delete a code snippet.
     """
-    try:
-        snippet = bhav.objects.get(pk=pk)
-    except bhav.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    # print("printing pk ", pk)
+    # try:
+    # cur_instance = bhav.objects.get(pk=pk)
+    # except bhav.DoesNotExist:
+        # bhavs= bhav.objects.all()
+        # serializer = bhavSerializer(bhavs, many = True)
+        # return Response(serializer.data)
+
+        # return Response(status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'GET':
-        serializer = bhavSerializer(snippet)
-        return Response(serializer.data)
+        if pk!=1:
+            cur_instance = bhav.objects.get(pk=pk)
+            serializer = bhavSerializer(cur_instance)
+            return Response(serializer.data)
+        else:
+            bhavs= bhav.objects.all()
+            serializer = bhavSerializer(bhavs, many = True)
+            return Response(serializer.data)
+
 
     elif request.method == 'PUT':
-        serializer = bhavSerializer(snippet, data=request.data)
+        cur_instance = bhav.objects.get(pk=pk)
+        serializer = bhavSerializer(cur_instance, data=request.data)
+        # print(cur_instance.code)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
@@ -56,15 +96,17 @@ def bhav_detail(request, pk):
     
 
     elif request.method == 'POST':
-        serializer = bhavSerializer(data =request.data)
+        serializer = bhavSerializer(data =  request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
-        snippet.delete()
+        cur_instance = bhav.objects.get(pk=pk)
+        cur_instance.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+    
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset  = bhav.objects.all()
@@ -72,22 +114,32 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes =[]
 
 
-class ReactView(APIView):
-    def get(self,request):
-        output = [{"code":output.code,
-                   "name":output.name,
-                   "open":output.open,
-                   "high":output.high,
-                   "low":output.low,
-                   "close":output.close}
-                   for output in bhav.objects.all()]
-        return Response(output)
+# class ReactView(APIView):
+#     def get(self,request):
+#         output = [{"code":output.code,
+#                    "name":output.name,
+#                    "open":output.open,
+#                    "high":output.high,
+#                    "low":output.low,
+#                    "close":output.close}
+#                    for output in bhav.objects.all()]
+#         return Response(output)
+
+    # def get(self,request,pk):
+    #     output = [{"code":output.code,
+    #                "name":output.name,
+    #                "open":output.open,
+    #                "high":output.high,
+    #                "low":output.low,
+    #                "close":output.close}
+    #                for output in bhav.objects.all()]
+    #     return Response(output)
     
-    def post(self,request):
-        serializer = bhavSerializer(data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            return Response(serializer.data)
+    # def post(self,request):
+    #     serializer = bhavSerializer(data=request.data)
+    #     if serializer.is_valid(raise_exception=True):
+    #         serializer.save()
+    #         return Response(serializer.data)
     
     # def delete(self,request,pk):
     #     snippet = self.get_object(pk)
@@ -172,6 +224,9 @@ def fetch_and_save(request):
 
 
 def fetch_and_display(request):
+    '''
+    not in use
+    '''
     # bhav_list = bhav.objects.all()
     # return render(request, 'polls/detail.html', {'bhav_list':bhav_list})
     """View function for home page of site."""
@@ -200,6 +255,9 @@ def fetch_and_display(request):
     return render(request, 'polls/detail.html',context=context)
 
 def delete_record(request, bhav_code):
+    '''
+    not in use
+    '''
     record = get_object_or_404(bhav, pk=bhav_code)
     output  = str(record.code)+" and "+record.name
     record.delete()
